@@ -5,7 +5,7 @@ var request = require('request');
 
 //factual nodejs api here: http://blog.factual.com/factual-node-js-driver
 var Factual = require('factual-api');
-var factual = new Factual('YOUR KEY', 'YOUR SECRET');
+var factual = new Factual('qUV7WKqUmCsYqVMXG9urVebo9MNLgt0cBE2fT1s8', 'tKG3MHLf1QnpYNS6Mxhtosv4DeoT9rdR0yGeHHrz');
 
 var FACTUAL_RADIUS_METERS = 20000;
 var MAX_WALK_TIME_SECONDS = 1200;
@@ -14,8 +14,8 @@ var MAX_NON_WALKING_DISTANCE = 4000;
 //travel time details here: http://www.traveltimeapp.com/
 var TT_DATA_URL = "http://api.igeolise.com/time_filter";
 var TT_MAPS_URL = "http://api.igeolise.com/time_map";
-var TT_APP_ID = "YOUR APP ID";
-var TT_APP_KEY = "YOUR APP KEY";
+var TT_APP_ID = "642843bd";
+var TT_APP_KEY = "6d2dcf13a8a8a8f6a1fddbc452515ece";
 
 
 app.get('/', function(req, res){
@@ -42,6 +42,10 @@ app.get('/restaurants-api', function(req, res){
         writeEmptyResponse( res );
         return;
     }
+    
+    
+    //lat = parseFloat("32.66962");
+    //lon = parseFloat("-117.094619");
 
     //http://api.v3.factual.com/t/restaurants-us
     //get source data points from factual
@@ -92,13 +96,13 @@ app.get('/restaurants-api', function(req, res){
                 if (!tt_error && tt_res.statusCode == 200) {
 
                     var result = eval(tt_body);
-                    //console.log( result.length )
+                    console.log( result.length )
 
                     if ( result.length > 0 ){
                         for (var x=0; x<result.length; x++) {
                             var item = result[x];
                             for ( var key in item ){
-                                //console.log( key, item )
+                                console.log( key, item )
                                 var target = map[key];
                                 if ( target ){
                                     target[ "travel_time_seconds"] = item[key];
@@ -113,19 +117,21 @@ app.get('/restaurants-api', function(req, res){
 
                         delete params.points;
                         request({url:TT_MAPS_URL, method:"POST", json:params, headers:headers}, function (ttt_error, ttt_res, ttt_body) {
-                            //console.log(ttt_body);
 
                             if (!tt_error && tt_res.statusCode == 200) {
-
                                 var polygons = eval(ttt_body);
                                 var result = {
-                                    points: output,
+                                    points: output
+                                    ,
                                     polygons: polygons
                                 }
-
+                                console.log("******************************************");
+                                console.log(JSON.stringify(result));
+                                console.log("******************************************");
                                 res.send(JSON.stringify(result));
                             }
                             else  {
+                            	  console("Errorneous status code or tt_error");
                                 writeEmptyResponse( res );
                             }
                         });
@@ -137,7 +143,6 @@ app.get('/restaurants-api', function(req, res){
 
                 }
                 else  {
-
                     writeNonWalkingResponse( data, map, res );
                 }
 
